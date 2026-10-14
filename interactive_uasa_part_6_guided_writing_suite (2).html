@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UASA Part 6 Guided Writing - Interactive Practice Suite</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Quicksand', 'sans-serif'],
+                        display: ['Fredoka', 'cursive'],
+                    },
+                    colors: {
+                        cutePink: { 50: '#fff1f2', 100: '#ffe4e6', 200: '#fecdd3', 400: '#fb7185', 500: '#f43f5e', 600: '#e11d48' },
+                        cutePurple: { 50: '#faf5ff', 100: '#f3e8ff', 200: '#e9d5ff', 400: '#c084fc', 500: '#a855f7', 600: '#9333ea' },
+                        cuteBlue: { 50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7' },
+                        cuteGreen: { 50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 400: '#4ade80', 500: '#22c55e', 600: '#16a34a' },
+                        cuteAmber: { 50: '#fffbeb', 100: '#fef3c7', 200: '#fde68a', 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fdf2f8; }
+        ::-webkit-scrollbar-thumb { background: #f472b6; border-radius: 999px; }
+
+        @keyframes float-gentle {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-5px) rotate(2deg); }
+        }
+        .animate-float { animation: float-gentle 3.5s infinite ease-in-out; }
+
+        .cute-card { transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .cute-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -6px rgba(244, 63, 94, 0.15); }
+
+        .cute-btn { transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .cute-btn:hover { transform: scale(1.03) translateY(-2px); }
+        .cute-btn:active { transform: scale(0.97); }
+
+        #confettiCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 1000; }
+    </style>
+</head>
+<body class="h-full text-slate-800 font-sans antialiased bg-gradient-to-b from-pink-50/80 via-purple-50/40 to-sky-50/60 flex flex-col selection:bg-pink-400 selection:text-white">
+
+    <canvas id="confettiCanvas"></canvas>
+
+    <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 text-sm font-semibold max-w-md">
+        <span id="toastIcon" class="text-pink-400 text-xl">✨</span>
+        <span id="toastMessage">Notification message</span>
+    </div>
+
+    <header class="bg-white/90 backdrop-blur-md border-b border-pink-100 sticky top-0 z-40 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-pink-500 via-purple-500 to-indigo-500 flex items-center justify-center text-white shadow-md animate-float">
+                    <span class="text-xl">✍️</span>
+                </div>
+                <div>
+                    <h1 class="font-display font-bold text-base sm:text-lg leading-tight text-slate-900 flex items-center gap-1.5">
+                        <span>UASA Part 6 Writing Studio</span>
+                        <span class="text-xs px-2.5 py-0.5 rounded-full bg-pink-100 text-pink-700 font-bold font-sans">10 Marks 🌟</span>
+                    </h1>
+                    <p class="text-xs font-bold text-purple-600 tracking-wide">Interactive Guided Practice (30–50 Words)</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button onclick="toggleSound()" class="p-2.5 rounded-2xl text-slate-500 hover:text-pink-600 hover:bg-pink-50 transition cute-btn" title="Toggle Audio">
+                    <i id="soundIcon" class="fa-solid fa-volume-high text-lg"></i>
+                </button>
+
+                <div id="pupilHeaderBadge" class="hidden flex items-center gap-2 bg-pink-50 border border-pink-200 px-3.5 py-1.5 rounded-full text-xs sm:text-sm">
+                    <span id="badgeAvatar" class="text-xl">🦊</span>
+                    <span id="badgeName" class="font-bold text-slate-800">Pupil</span>
+                    <span class="text-pink-300">|</span>
+                    <span id="badgeClass" class="text-pink-700 font-bold">5 Cemerlang</span>
+                </div>
+
+                <button onclick="openTeacherPinModal()" class="flex items-center gap-2 px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl text-xs font-bold transition shadow-sm cute-btn">
+                    <i class="fa-solid fa-user-shield text-pink-400"></i>
+                    <span class="hidden sm:inline">Teacher Dashboard</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <section id="welcomeScreen" class="max-w-2xl mx-auto my-4">
+            <div class="bg-white rounded-3xl p-6 sm:p-10 shadow-xl border-4 border-pink-200 text-center relative overflow-hidden">
+                <div class="relative z-10 space-y-4">
+                    <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-pink-100 border-2 border-pink-300 text-pink-600 shadow-inner text-4xl animate-float">
+                        🎨
+                    </div>
+                    <h2 class="font-display text-2xl sm:text-3xl font-black text-slate-800">UASA Part 6 Interactive Studio!</h2>
+                    <p class="text-slate-600 text-xs sm:text-sm max-w-md mx-auto font-semibold">
+                        Master guided writing with Sentence Ordering and Exam Free Writing! Send results to your teacher via WhatsApp & Google Sheets.
+                    </p>
+
+                    <form onsubmit="handleStartStudio(event)" class="text-left space-y-4 pt-2">
+                        <div>
+                            <label class="block text-xs font-extrabold text-purple-700 uppercase tracking-wider mb-1.5">Your Full Name 🌸</label>
+                            <input type="text" id="pupilNameInput" required placeholder="e.g. Aiman Hakim" class="w-full px-4 py-3 rounded-2xl border-2 border-purple-200 focus:border-purple-500 outline-none text-sm font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-extrabold text-pink-700 uppercase tracking-wider mb-1.5">Your Class Name 🎨</label>
+                            <input type="text" id="pupilClassInput" required placeholder="e.g. 5 Cemerlang" class="w-full px-4 py-3 rounded-2xl border-2 border-pink-200 focus:border-pink-500 outline-none text-sm font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-extrabold text-indigo-700 uppercase tracking-wider mb-1.5">Choose Avatar Buddy 🐰</label>
+                            <div class="flex flex-wrap gap-2" id="avatarPicker">
+                                <!-- JS Populated -->
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full py-4 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 hover:from-pink-600 hover:to-indigo-700 text-white font-display font-extrabold text-base rounded-2xl shadow-lg transition cute-btn">
+                            Start Writing Practice! 🚀
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Studio View -->
+        <section id="studioScreen" class="hidden space-y-6">
+
+            <div class="bg-white rounded-3xl p-5 shadow-sm border border-pink-100 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-extrabold uppercase tracking-wider text-pink-600 font-display">1. Choose a Topic from UASA Part 6:</span>
+                    <span id="activeTopicBadge" class="text-xs font-bold px-3 py-1 bg-purple-100 text-purple-700 rounded-full">Topic 1 of 5</span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5" id="topicGrid">
+                    <!-- JS Populated Topics -->
+                </div>
+            </div>
+
+            <!-- Interactive Mode Selector Tabs -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-1" id="modeTabs">
+                <button id="modeTab1" onclick="switchMode('scramble')" class="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition whitespace-nowrap bg-purple-600 text-white border-2 border-purple-600 shadow-md">
+                    <span>🧩 Mode 1: Sentence Reordering</span>
+                </button>
+                <button id="modeTab3" onclick="switchMode('freeWrite')" class="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition whitespace-nowrap bg-white text-slate-600 border-2 border-slate-200 hover:bg-slate-50">
+                    <span>📝 Mode 2: Exam Free Writing</span>
+                </button>
+            </div>
+
+            <!-- Active Prompt Banner -->
+            <div class="bg-gradient-to-r from-amber-500 via-orange-500 to-pink-500 rounded-3xl p-5 text-white shadow-md space-y-3 relative overflow-hidden">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div>
+                        <div class="inline-flex items-center gap-1.5 px-3 py-0.5 bg-white/20 rounded-full text-[11px] font-bold text-amber-100">
+                            <span id="promptLevel">Level A1</span>
+                            <span>•</span>
+                            <span id="promptSkill">Inviting</span>
+                        </div>
+                        <h3 class="font-display font-black text-xl sm:text-2xl mt-1" id="promptTitle">Birthday Party Invitation</h3>
+                    </div>
+                    <span class="text-xs font-extrabold bg-white text-amber-900 px-3 py-1.5 rounded-xl shadow-xs" id="promptTarget">Target: 30–50 words</span>
+                </div>
+                <p class="text-xs sm:text-sm text-amber-50 font-medium leading-relaxed bg-black/10 p-3 rounded-2xl border border-white/20" id="promptScenario">
+                    Scenario loading...
+                </p>
+                <div class="flex flex-wrap gap-2 text-xs font-bold text-amber-900" id="promptChecklistBadges">
+                    <!-- JS Injected Prompt Rules -->
+                </div>
+            </div>
+
+            <div id="scrambleModeView" class="bg-white rounded-3xl p-6 shadow-sm border border-purple-100 space-y-5">
+                <div class="flex items-center justify-between border-b border-purple-100 pb-3">
+                    <div>
+                        <h4 class="font-display font-bold text-lg text-slate-900">🧩 Mode 1: Sentence Reordering Game</h4>
+                        <p class="text-xs text-slate-500 font-bold">Select the correct sequence number (1 to 5) to assemble the email correctly!</p>
+                    </div>
+                    <button onclick="checkScrambleAnswer()" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-extrabold rounded-xl transition cute-btn shadow-md">
+                        Check Order ✨
+                    </button>
+                </div>
+
+                <div class="space-y-3" id="scrambleList">
+                    <!-- JS Injected Sentences -->
+                </div>
+
+                <div id="scrambleFeedback" class="hidden p-4 rounded-2xl text-xs font-bold text-center"></div>
+            </div>
+
+            <div id="freeWriteModeView" class="hidden bg-white rounded-3xl p-6 shadow-sm border border-pink-100 space-y-5">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-pink-100 pb-3">
+                    <div>
+                        <h4 class="font-display font-bold text-lg text-slate-900">📝 Mode 2: Exam Free Writing</h4>
+                        <p class="text-xs text-slate-500 font-bold">Write your response freely (30 to 50 words). Our smart detector checks your requirements in real-time!</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="freeWriteWordCount" class="text-xs font-black px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 border border-slate-200">0 / 30–50 words</span>
+                    </div>
+                </div>
+
+                <!-- Prompt Requirements Live Tracker -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5" id="livePromptTracker">
+                    <!-- JS Injected Live Checklist Badges -->
+                </div>
+
+                <div class="border-2 border-pink-100 rounded-2xl overflow-hidden">
+                    <div class="bg-pink-100/70 px-4 py-2 border-b border-pink-100 text-xs font-bold text-pink-900" id="freeWriteRecipientHeader">
+                        To: friend@xmail.com
+                    </div>
+                    <textarea id="freeWriteArea" oninput="handleFreeWriteInput()" rows="7" placeholder="Write your response here..." class="w-full p-4 text-xs sm:text-sm font-semibold outline-none resize-y leading-relaxed"></textarea>
+                </div>
+
+                <div class="flex justify-end">
+                    <button onclick="submitCompletedWriting()" class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-extrabold text-sm rounded-2xl shadow-lg cute-btn flex items-center gap-2">
+                        <span>Finish & Grade Email</span>
+                        <span>🎉</span>
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+        <section id="resultsScreen" class="hidden max-w-4xl mx-auto space-y-6">
+            <div class="bg-gradient-to-br from-pink-500 via-purple-600 to-indigo-700 text-white rounded-3xl p-8 shadow-2xl relative overflow-hidden space-y-6">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
+                    <div class="space-y-3">
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1 bg-white/20 rounded-full text-xs font-bold text-pink-100 backdrop-blur-md">
+                            🌟 UASA Part 6 Practice Complete!
+                        </div>
+                        <h2 class="font-display text-3xl font-black" id="resultGreeting">Awesome Job! 🎉</h2>
+                        <p class="text-pink-100 text-xs sm:text-sm font-semibold max-w-md">Your email response has been evaluated. Follow the simple steps below to send your score to your teacher!</p>
+                        
+                        <div id="syncResultStatus" class="inline-flex items-center gap-2 text-xs text-emerald-200 pt-1 font-bold">
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+                            <span>Syncing score to teacher cloud...</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/15 backdrop-blur-md p-6 rounded-3xl border border-white/25 text-center min-w-[200px]">
+                        <span class="text-xs uppercase tracking-widest font-black text-pink-100 block mb-1">Writing Score</span>
+                        <div class="font-display text-5xl font-black text-amber-300" id="finalScoreDisplay">10 / 10</div>
+                        <span class="text-xs font-bold text-white block mt-1" id="wordCountResultBadge">42 words</span>
+                    </div>
+                </div>
+
+                <!-- SIMPLE INSTRUCTIONS BANNER -->
+                <div class="bg-white/15 backdrop-blur-md p-4 rounded-2xl border border-white/25 text-xs text-pink-100 space-y-1">
+                    <div class="font-extrabold text-white text-sm flex items-center gap-2">
+                        <span>📌 Instructions for Pupils & Parents:</span>
+                    </div>
+                    <p class="leading-relaxed">
+                        Please submit your practice score using one of the two options below:
+                        <br>
+                        <strong>Option 1 (WhatsApp):</strong> Sends a direct score summary message to your teacher's phone.
+                        <br>
+                        <strong>Option 2 (Google Sheets):</strong> Records your score directly into your teacher's online class spreadsheet.
+                    </p>
+                </div>
+
+                <div class="pt-2 border-t border-white/20 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    
+                    <!-- TASK 1: WHATSAPP SEND FUNCTION -->
+                    <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 space-y-3">
+                        <div>
+                            <span class="font-bold text-white text-xs uppercase tracking-wider block flex items-center gap-1.5">
+                                <i class="fa-brands fa-whatsapp text-emerald-300 text-lg"></i>
+                                <span>Task 1: Send via WhatsApp</span>
+                            </span>
+                            <p class="text-[11px] text-pink-100 mt-1">Send your pre-formatted score report directly to your teacher's WhatsApp number!</p>
+                        </div>
+                        <button onclick="sendWhatsAppScore()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs rounded-xl shadow-md transition cute-btn flex items-center justify-center gap-2">
+                            <i class="fa-brands fa-whatsapp text-lg"></i>
+                            <span>Send Score to Teacher</span>
+                        </button>
+                    </div>
+
+                    <!-- TASK 2: GOOGLE SHEETS SYNC FUNCTION -->
+                    <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 space-y-3">
+                        <div>
+                            <span class="font-bold text-white text-xs uppercase tracking-wider block flex items-center gap-1.5">
+                                <i class="fa-solid fa-table-cells text-indigo-300 text-lg"></i>
+                                <span>Task 2: Record to Google Sheet</span>
+                            </span>
+                            <p class="text-[11px] text-pink-100 mt-1">Scores are automatically saved to your teacher's Google Sheet database!</p>
+                        </div>
+                        <button onclick="triggerManualCloudSync()" class="w-full py-3 bg-indigo-500 hover:bg-indigo-600 text-white font-extrabold text-xs rounded-xl shadow-md transition cute-btn flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+                            <span>Re-sync to Google Sheet</span>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Practice Another Topic Action -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+                <button onclick="resetToStudio()" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm rounded-2xl transition cute-btn">
+                    🔄 Practice Another Topic
+                </button>
+            </div>
+        </section>
+
+        <section id="teacherScreen" class="hidden space-y-6">
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-xl shadow-md">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-display text-2xl font-bold text-slate-900">Teacher Analytics Dashboard</h2>
+                        <p class="text-xs text-slate-500 font-bold">Manage pupil submissions, pre-add phone number, and Google Sheets sync</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="openAppsScriptModal()" class="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition flex items-center gap-2 border border-indigo-200">
+                        <i class="fa-solid fa-code"></i>
+                        <span>Apps Script Setup</span>
+                    </button>
+                    <button onclick="exitTeacherMode()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Back to Practice</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- WhatsApp & Cloud Config Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-brands fa-whatsapp text-emerald-600 text-base"></i>
+                            <span>Teacher Pre-added WhatsApp Phone Number</span>
+                        </label>
+                        <span class="text-[11px] text-slate-400">e.g. 60123456789</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="teacherPhoneInput" placeholder="601XXXXXXXX"
+                            class="flex-1 px-4 py-2 rounded-xl border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 text-sm outline-none font-mono">
+                        <button onclick="saveTeacherPhone()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition shadow-sm whitespace-nowrap">
+                            Save Phone
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-table-cells text-indigo-600 text-base"></i>
+                            <span>Google Sheets Web App URL</span>
+                        </label>
+                        <span class="text-[11px] text-slate-400">2-Way Cloud Sync</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="url" id="teacherSheetUrlInput" placeholder="https://script.google.com/macros/s/.../exec"
+                            class="flex-1 px-4 py-2 rounded-xl border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 text-xs outline-none">
+                        <button onclick="saveTeacherSheetUrl()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition shadow-sm whitespace-nowrap">
+                            Save URL
+                        </button>
+                        <button onclick="syncLiveFromGoogleSheet()" class="px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl transition shadow-sm flex items-center gap-1.5 whitespace-nowrap">
+                            <i class="fa-solid fa-arrows-rotate" id="syncSpinIcon"></i>
+                            <span>Fetch Cloud</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <h3 class="font-display font-bold text-lg text-slate-900">Pupil Submissions Table</h3>
+                        <p class="text-xs text-slate-500 font-bold">Filter, export CSV, or clear results</p>
+                    </div>
+
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <input type="text" id="teacherSearchInput" oninput="renderTeacherTable()" placeholder="Search pupil name..." class="px-3 py-1.5 rounded-xl border border-slate-300 text-xs outline-none focus:border-indigo-500">
+                        <button onclick="exportScoresCSV()" class="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-csv"></i>
+                            <span>Export CSV</span>
+                        </button>
+                        <button onclick="promptClearScores()" class="px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs rounded-xl transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-trash"></i>
+                            <span>Clear</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-200 bg-slate-50 text-slate-500 text-xs uppercase font-bold tracking-wider">
+                                <th class="p-3">Pupil</th>
+                                <th class="p-3">Class</th>
+                                <th class="p-3">Topic</th>
+                                <th class="p-3 text-center">Score (/10)</th>
+                                <th class="p-3 text-center">Word Count</th>
+                                <th class="p-3 text-right">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teacherTableBody" class="divide-y divide-slate-100">
+                            <!-- JS Injected Row Data -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- PIN Security Modal -->
+    <div id="pinModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl border border-slate-100 text-center space-y-4">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto text-xl font-bold">🔒</div>
+            <h3 class="font-display text-xl font-bold text-slate-900">Teacher Access PIN</h3>
+            <p class="text-xs text-slate-500 font-bold">Enter security PIN code (Default: <span class="font-mono font-bold text-indigo-600">1234</span>)</p>
+            
+            <input type="password" id="pinInput" placeholder="Enter PIN" maxlength="6" 
+                class="w-full text-center tracking-widest text-2xl font-bold py-3 rounded-2xl border border-slate-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none">
+            
+            <p id="pinErrorMsg" class="text-xs font-bold text-rose-500 hidden">Incorrect PIN. Please try again.</p>
+
+            <div class="flex gap-2">
+                <button onclick="closePinModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition">Cancel</button>
+                <button onclick="verifyTeacherPin()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition shadow-md">Unlock</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Apps Script Setup Guide Modal -->
+    <div id="scriptModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl border border-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">⚙️</span>
+                    <div>
+                        <h3 class="font-display text-lg font-bold text-slate-900">Google Apps Script Setup Guide</h3>
+                        <p class="text-xs text-slate-500 font-bold">2-Way Cloud Sync for Google Sheets</p>
+                    </div>
+                </div>
+                <button onclick="closeAppsScriptModal()" class="text-slate-400 hover:text-slate-600 text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <ol class="text-xs text-slate-600 space-y-2 list-decimal list-inside font-semibold">
+                <li>Create a new <a href="https://sheets.new" target="_blank" class="text-indigo-600 underline font-bold">Google Sheet</a>.</li>
+                <li>Go to <strong>Extensions &gt; Apps Script</strong>.</li>
+                <li>Paste the script snippet below and click <strong>Save</strong>.</li>
+                <li>Click <strong>Deploy &gt; New deployment</strong>. Choose type <strong>Web app</strong>.</li>
+                <li>Set "Execute as" to <strong>Me</strong> and "Who has access" to <strong>Anyone</strong> (CRITICAL).</li>
+                <li>Deploy and paste the Web App URL into the Teacher Dashboard box!</li>
+            </ol>
+
+            <div class="relative">
+                <pre class="bg-slate-900 text-slate-100 p-4 rounded-2xl text-xs font-mono overflow-x-auto select-all max-h-60" id="scriptCodeSnippet">
+function doGet(e) {
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var data = sheet.getDataRange().getValues();
+    if (data.length <= 1) return ContentService.createTextOutput(JSON.stringify({ status: 'success', data: [] })).setMimeType(ContentService.MimeType.JSON);
+    var headers = data[0];
+    var rows = [];
+    for (var i = 1; i < data.length; i++) {
+      var row = {};
+      for (var j = 0; j < headers.length; j++) { row[headers[j]] = data[i][j]; }
+      rows.push(row);
+    }
+    return ContentService.createTextOutput(JSON.stringify({ status: 'success', data: rows })).setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: err.toString() })).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doPost(e) {
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(["Timestamp", "Name", "Class", "Avatar", "Topic", "Score", "WordCount", "EmailDraft"]);
+    }
+    var data = {};
+    if (e && e.postData && e.postData.contents) {
+      try { data = JSON.parse(e.postData.contents); } catch(err) { data = e.parameter || {}; }
+    } else if (e && e.parameter) { data = e.parameter; }
+    
+    sheet.appendRow([
+      new Date(),
+      data.name || '',
+      data.className || '',
+      data.avatar || '',
+      data.topic || '',
+      data.score !== undefined ? data.score : 0,
+      data.wordCount || 0,
+      data.emailDraft || ''
+    ]);
+    return ContentService.createTextOutput(JSON.stringify({ status: 'success' })).setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: err.toString() })).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+</pre>
+                <button onclick="copyAppsScriptCode()" class="absolute top-3 right-3 px-3 py-1 bg-white/20 hover:bg-white/30 text-white rounded-lg text-xs font-bold transition backdrop-blur-sm">
+                    Copy Code
+                </button>
+            </div>
+
+            <button onclick="closeAppsScriptModal()" class="w-full py-2.5 bg-indigo-600 text-white font-bold text-xs rounded-xl">Done & Close</button>
+        </div>
+    </div>
+
+    <script>
+        const PART6_TOPICS = [
+            {
+                id: "topic1",
+                icon: "🎂",
+                title: "Birthday Party",
+                level: "Level A1",
+                skill: "Inviting",
+                recipient: "Adam@tfmail.com",
+                subject: "My Birthday Party 🎈",
+                scenario: "You are having a birthday party at home this Saturday. You want your friend, Adam, to come.",
+                prompts: [
+                    { id: "p1", text: "Invite him to your birthday party", keywords: ["invite", "party", "come", "birthday"] },
+                    { id: "p2", text: "Tell him what time the party starts", keywords: ["time", "p.m.", "a.m.", "starts", "o'clock", "3"] },
+                    { id: "p3", text: "Tell him what you will do together", keywords: ["play", "eat", "cake", "games", "sing"] }
+                ],
+                scrambleSentences: [
+                    { text: "Hi Adam,", correctPos: 1 },
+                    { text: "I am having a birthday party at my house this Saturday.", correctPos: 2 },
+                    { text: "The party starts at 3:00 p.m. in the afternoon.", correctPos: 3 },
+                    { text: "We can eat delicious cake and play fun party games together!", correctPos: 4 },
+                    { text: "Hope you can come! Your friend, [Name]", correctPos: 5 }
+                ]
+            },
+            {
+                id: "topic2",
+                icon: "🎒",
+                title: "New School Bag",
+                level: "Level A1",
+                skill: "Describing",
+                recipient: "Sara@tfmail.com",
+                subject: "My New School Bag 🎒",
+                scenario: "Your aunt gave you a new school bag. You want to tell your cousin, Sara, about it.",
+                prompts: [
+                    { id: "p1", text: "Describe the colour and size of your bag", keywords: ["blue", "red", "pink", "black", "big", "small", "color", "colour"] },
+                    { id: "p2", text: "Tell her when you got it", keywords: ["aunt", "yesterday", "weekend", "got", "received", "gave"] },
+                    { id: "p3", text: "Explain why you like it", keywords: ["like", "because", "waterproof", "pockets", "cute", "cool"] }
+                ],
+                scrambleSentences: [
+                    { text: "Hi Sara,", correctPos: 1 },
+                    { text: "My aunt gave me a brand new school bag last weekend.", correctPos: 2 },
+                    { text: "It is bright blue in color and very spacious.", correctPos: 3 },
+                    { text: "I like it because it has many pockets and is waterproof.", correctPos: 4 },
+                    { text: "Bye! Your cousin, [Name]", correctPos: 5 }
+                ]
+            },
+            {
+                id: "topic3",
+                icon: "🏸",
+                title: "Badminton Practice",
+                level: "Level A1",
+                skill: "Making Arrangements",
+                recipient: "Kumar@tfmail.com",
+                subject: "Badminton Practice 🏸",
+                scenario: "You and your friend, Kumar, want to practise badminton before a school match.",
+                prompts: [
+                    { id: "p1", text: "Suggest a day and time to practise", keywords: ["friday", "saturday", "4:00", "p.m.", "time", "day", "practise"] },
+                    { id: "p2", text: "Tell him where to meet", keywords: ["hall", "court", "school", "meet"] },
+                    { id: "p3", text: "Remind him what to bring", keywords: ["bring", "racquet", "shuttlecock", "water", "bottle"] }
+                ],
+                scrambleSentences: [
+                    { text: "Hi Kumar,", correctPos: 1 },
+                    { text: "Let's practise badminton this Friday at 4:00 p.m. for our school match.", correctPos: 2 },
+                    { text: "We can meet at the school badminton court.", correctPos: 3 },
+                    { text: "Please remember to bring your racquet and a water bottle.", correctPos: 4 },
+                    { text: "See you there! [Name]", correctPos: 5 }
+                ]
+            },
+            {
+                id: "topic4",
+                icon: "🍜",
+                title: "Malaysian Food",
+                level: "Level A1",
+                skill: "Sharing Information",
+                recipient: "Lily@tfmail.com",
+                subject: "My Favourite Malaysian Food 😋",
+                scenario: "Your pen friend, Lily, wants to know about Malaysian food.",
+                prompts: [
+                    { id: "p1", text: "Name your favourite Malaysian food", keywords: ["nasi lemak", "laksa", "roti canai", "satay", "food"] },
+                    { id: "p2", text: "Describe what it tastes like", keywords: ["tastes", "spicy", "delicious", "sweet", "savory", "yummy"] },
+                    { id: "p3", text: "Tell her when you usually eat it", keywords: ["morning", "breakfast", "weekend", "eat", "usually"] }
+                ],
+                scrambleSentences: [
+                    { text: "Hi Lily,", correctPos: 1 },
+                    { text: "My favourite Malaysian food is Nasi Lemak.", correctPos: 2 },
+                    { text: "It tastes delicious and slightly spicy with sambal.", correctPos: 3 },
+                    { text: "I usually eat it for breakfast on weekend mornings.", correctPos: 4 },
+                    { text: "You should try it! Your friend, [Name]", correctPos: 5 }
+                ]
+            },
+            {
+                id: "topic5",
+                icon: "📖",
+                title: "Storybook Recommendation",
+                level: "Level A1-A2",
+                skill: "Recommending",
+                recipient: "Ben@tfmail.com",
+                subject: "Great Storybook Recommendation 🦁",
+                scenario: "Your friend, Ben, wants to read a storybook. You recently read a storybook and enjoyed it.",
+                prompts: [
+                    { id: "p1", text: "Recommend the storybook", keywords: ["recommend", "read", "book", "story", "title"] },
+                    { id: "p2", text: "Tell him about one character", keywords: ["character", "lion", "mouse", "boy", "brave", "kind"] },
+                    { id: "p3", text: "Explain why you enjoyed the story", keywords: ["enjoyed", "like", "because", "exciting", "lesson", "funny"] }
+                ],
+                scrambleSentences: [
+                    { text: "Hi Ben,", correctPos: 1 },
+                    { text: "I recommend you read 'The Lion and the Mouse'.", correctPos: 2 },
+                    { text: "The main character is a brave little mouse who helps a big lion.", correctPos: 3 },
+                    { text: "I enjoyed it because it teaches us about kindness and true friendship.", correctPos: 4 },
+                    { text: "Happy reading! [Name]", correctPos: 5 }
+                ]
+            }
+        ];
+
+        /* STATE MANAGEMENT */
+        let state = {
+            pupilName: '',
+            pupilClass: '',
+            pupilAvatar: '🦊',
+            activeTopicIndex: 0,
+            activeMode: 'scramble',
+            scrambleOrders: {},
+            soundEnabled: true,
+            // Pre-added teacher phone number (Default: 60123456789 or customized via URL/Teacher Dashboard)
+            teacherPhone: localStorage.getItem('uasa_part6_teacher_phone') || '60123456789',
+            sheetUrl: localStorage.getItem('uasa_part6_sheet_url') || '',
+            scoresHistory: JSON.parse(localStorage.getItem('uasa_part6_scores_history') || '[]')
+        };
+
+        const AVATARS = ['🦊', '🐱', '🐰', '🐼', '🦁', '🐯', '🦄', '🚀', '⭐'];
+
+        let audioCtx = null;
+        function playSound(type) {
+            if (!state.soundEnabled) return;
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, now);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'win') {
+                    [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.frequency.setValueAtTime(freq, now + idx * 0.1);
+                        g.gain.setValueAtTime(0.15, now + idx * 0.1);
+                        g.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.1 + 0.3);
+                        o.start(now + idx * 0.1);
+                        o.stop(now + idx * 0.1 + 0.3);
+                    });
+                }
+            } catch(e) {}
+        }
+
+        function toggleSound() {
+            state.soundEnabled = !state.soundEnabled;
+            document.getElementById('soundIcon').className = state.soundEnabled ? 'fa-solid fa-volume-high text-lg' : 'fa-solid fa-volume-xmark text-lg text-rose-500';
+            if (state.soundEnabled) playSound('click');
+        }
+
+        function triggerConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const particles = [];
+            const colors = ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
+
+            for (let i = 0; i < 90; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    speedY: Math.random() * 4 + 2,
+                    speedX: (Math.random() - 0.5) * 3
+                });
+            }
+
+            let start = Date.now();
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.y += p.speedY;
+                    p.x += p.speedX;
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(p.x, p.y, p.size, p.size);
+                });
+                if (Date.now() - start < 3000) requestAnimationFrame(animate);
+                else ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            animate();
+        }
+
+        function showToast(msg, icon = '✨') {
+            const toast = document.getElementById('toastNotification');
+            document.getElementById('toastMessage').textContent = msg;
+            document.getElementById('toastIcon').textContent = icon;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderAvatarPicker();
+            renderTopicGrid();
+            checkUrlParams();
+        });
+
+        function checkUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sheetUrl = urlParams.get('sheetUrl');
+            if (sheetUrl) { state.sheetUrl = sheetUrl; localStorage.setItem('uasa_part6_sheet_url', sheetUrl); }
+            const phone = urlParams.get('phone');
+            if (phone) { state.teacherPhone = phone; localStorage.setItem('uasa_part6_teacher_phone', phone); }
+        }
+
+        function setElementText(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text ?? '';
+        }
+
+        function renderAvatarPicker() {
+            const container = document.getElementById('avatarPicker');
+            if (!container) return;
+            container.innerHTML = AVATARS.map(av => `
+                <button type="button" onclick="selectAvatar('${av}')" class="w-10 h-10 rounded-2xl border-2 flex items-center justify-center text-lg transition ${av === state.pupilAvatar ? 'border-purple-600 bg-purple-50 scale-105 shadow-xs' : 'border-slate-200'}">
+                    ${av}
+                </button>
+            `).join('');
+        }
+
+        function selectAvatar(av) {
+            playSound('click');
+            state.pupilAvatar = av;
+            renderAvatarPicker();
+        }
+
+        function handleStartStudio(e) {
+            e.preventDefault();
+            playSound('click');
+            const nameInput = document.getElementById('pupilNameInput');
+            const classInput = document.getElementById('pupilClassInput');
+            
+            state.pupilName = nameInput ? nameInput.value.trim() : '';
+            state.pupilClass = classInput ? classInput.value.trim() : '';
+
+            setElementText('badgeAvatar', state.pupilAvatar);
+            setElementText('badgeName', state.pupilName);
+            setElementText('badgeClass', state.pupilClass);
+
+            document.getElementById('pupilHeaderBadge')?.classList.remove('hidden');
+            document.getElementById('welcomeScreen')?.classList.add('hidden');
+            document.getElementById('studioScreen')?.classList.remove('hidden');
+
+            loadTopic(0);
+        }
+
+        function renderTopicGrid() {
+            const grid = document.getElementById('topicGrid');
+            if (!grid) return;
+            grid.innerHTML = PART6_TOPICS.map((topic, idx) => `
+                <button type="button" onclick="loadTopic(${idx})" class="p-3 rounded-2xl border-2 text-left transition cute-btn ${idx === state.activeTopicIndex ? 'border-pink-500 bg-pink-50/80 shadow-xs' : 'border-slate-200 bg-white hover:border-slate-300'}">
+                    <div class="text-xl mb-1">${topic.icon}</div>
+                    <span class="text-xs font-bold block text-slate-800 leading-tight">${topic.title}</span>
+                </button>
+            `).join('');
+        }
+
+        function loadTopic(index) {
+            playSound('click');
+            state.activeTopicIndex = index;
+            state.scrambleOrders = {};
+            renderTopicGrid();
+
+            const topic = PART6_TOPICS[index];
+            if (!topic) return;
+
+            setElementText('activeTopicBadge', `Topic ${index + 1} of ${PART6_TOPICS.length}`);
+            setElementText('promptLevel', topic.level);
+            setElementText('promptSkill', topic.skill);
+            setElementText('promptTitle', topic.title);
+            setElementText('promptScenario', topic.scenario);
+
+            const badgesContainer = document.getElementById('promptChecklistBadges');
+            if (badgesContainer) {
+                badgesContainer.innerHTML = (topic.prompts || []).map((p, i) => `
+                    <span class="px-2.5 py-1 rounded-xl bg-white/80 border border-amber-200 text-amber-900 font-bold">
+                        ${i + 1}. ${p.text}
+                    </span>
+                `).join('');
+            }
+
+            setElementText('freeWriteRecipientHeader', `To: ${topic.recipient} | Subject: ${topic.subject}`);
+
+            renderScrambleMode();
+            renderFreeWriteTracker();
+
+            const freeWriteArea = document.getElementById('freeWriteArea');
+            if (freeWriteArea) freeWriteArea.value = '';
+
+            setElementText('freeWriteWordCount', '0 / 30–50 words');
+        }
+
+        function switchMode(mode) {
+            playSound('click');
+            state.activeMode = mode;
+
+            document.getElementById('scrambleModeView')?.classList.toggle('hidden', mode !== 'scramble');
+            document.getElementById('freeWriteModeView')?.classList.toggle('hidden', mode !== 'freeWrite');
+
+            const modeTab1 = document.getElementById('modeTab1');
+            const modeTab3 = document.getElementById('modeTab3');
+            if (modeTab1) modeTab1.className = mode === 'scramble' ? 'flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition whitespace-nowrap bg-purple-600 text-white border-2 border-purple-600 shadow-md' : 'flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition whitespace-nowrap bg-white text-slate-600 border-2 border-slate-200 hover:bg-slate-50';
+            if (modeTab3) modeTab3.className = mode === 'freeWrite' ? 'flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition whitespace-nowrap bg-pink-600 text-white border-2 border-pink-600 shadow-md' : 'flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition whitespace-nowrap bg-white text-slate-600 border-2 border-slate-200 hover:bg-slate-50';
+        }
+
+        function renderScrambleMode() {
+            const topic = PART6_TOPICS[state.activeTopicIndex];
+            const container = document.getElementById('scrambleList');
+            document.getElementById('scrambleFeedback')?.classList.add('hidden');
+            if (!container || !topic) return;
+
+            const items = [...topic.scrambleSentences].sort(() => 0.5 - Math.random());
+
+            container.innerHTML = items.map((item, idx) => `
+                <div class="p-3.5 rounded-2xl border border-purple-100 bg-purple-50/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <p class="text-xs sm:text-sm font-semibold text-slate-800 flex-1">${item.text.replace('[Name]', state.pupilName || 'Your Name')}</p>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-slate-500">Position:</span>
+                        <select onchange="selectScramblePos(${idx}, this.value, ${item.correctPos})" class="px-3 py-1.5 rounded-xl border border-purple-300 font-bold text-xs text-purple-900 bg-white">
+                            <option value="">-- Step --</option>
+                            ${[1,2,3,4,5].map(n => `<option value="${n}">Step ${n}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectScramblePos(index, val, correct) {
+            playSound('click');
+            state.scrambleOrders[index] = { selected: parseInt(val), correct: correct };
+        }
+
+        function checkScrambleAnswer() {
+            playSound('click');
+            const feedback = document.getElementById('scrambleFeedback');
+            if (!feedback) return;
+
+            const total = Object.keys(state.scrambleOrders).length;
+
+            if (total < 5) {
+                feedback.className = "p-4 rounded-2xl text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 block";
+                feedback.textContent = "⚠️ Please select step numbers for all 5 sentences!";
+                return;
+            }
+
+            let correctCount = 0;
+            Object.values(state.scrambleOrders).forEach(item => {
+                if (item.selected === item.correct) correctCount++;
+            });
+
+            if (correctCount === 5) {
+                playSound('win');
+                triggerConfetti();
+                feedback.className = "p-4 rounded-2xl text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 block";
+                feedback.textContent = "🎉 Excellent! All 5 sentences are in the perfect order!";
+            } else {
+                feedback.className = "p-4 rounded-2xl text-xs font-bold text-purple-800 bg-purple-50 border border-purple-200 block";
+                feedback.textContent = `⭐ You got ${correctCount} out of 5 sentences right! Try adjusting step numbers again.`;
+            }
+        }
+
+        function renderFreeWriteTracker() {
+            const topic = PART6_TOPICS[state.activeTopicIndex];
+            const container = document.getElementById('livePromptTracker');
+            if (!container || !topic) return;
+
+            container.innerHTML = topic.prompts.map((p, idx) => `
+                <div id="trackerBadge_${idx}" class="p-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-500 text-xs font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-circle-notch text-slate-400" id="trackerIcon_${idx}"></i>
+                    <span>Rule ${idx + 1}: ${p.text}</span>
+                </div>
+            `).join('');
+        }
+
+        function handleFreeWriteInput() {
+            const freeWriteArea = document.getElementById('freeWriteArea');
+            if (!freeWriteArea) return;
+            const text = freeWriteArea.value;
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            const topic = PART6_TOPICS[state.activeTopicIndex];
+
+            const countBadge = document.getElementById('freeWriteWordCount');
+            if (countBadge) {
+                countBadge.textContent = `${words} / 30–50 words`;
+
+                if (words >= 30 && words <= 50) {
+                    countBadge.className = "text-xs font-black px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-800 border border-emerald-300";
+                } else {
+                    countBadge.className = "text-xs font-black px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 border border-slate-200";
+                }
+            }
+
+            if (topic && topic.prompts) {
+                topic.prompts.forEach((prompt, idx) => {
+                    const badge = document.getElementById(`trackerBadge_${idx}`);
+                    const icon = document.getElementById(`trackerIcon_${idx}`);
+                    if (!badge || !icon) return;
+
+                    const matches = prompt.keywords.some(kw => text.toLowerCase().includes(kw));
+
+                    if (matches) {
+                        badge.className = "p-3 rounded-2xl border border-emerald-300 bg-emerald-50 text-emerald-800 text-xs font-bold flex items-center gap-2";
+                        icon.className = "fa-solid fa-circle-check text-emerald-600";
+                    } else {
+                        badge.className = "p-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-500 text-xs font-bold flex items-center gap-2";
+                        icon.className = "fa-solid fa-circle-notch text-slate-400";
+                    }
+                });
+            }
+        }
+
+        function submitCompletedWriting() {
+            playSound('win');
+            triggerConfetti();
+
+            const topic = PART6_TOPICS[state.activeTopicIndex];
+            const freeWriteArea = document.getElementById('freeWriteArea');
+            const text = freeWriteArea ? freeWriteArea.value.trim() : '';
+            const words = text ? text.split(/\s+/).length : 0;
+
+            let score = 10;
+            if (words < 20) score = 6;
+            else if (words < 30) score = 8;
+
+            const record = {
+                id: Date.now().toString(),
+                name: state.pupilName || 'Pupil',
+                className: state.pupilClass || '5 Cemerlang',
+                avatar: state.pupilAvatar || '🦊',
+                topic: topic.title,
+                score: score,
+                maxScore: 10,
+                wordCount: words,
+                emailDraft: text,
+                date: new Date().toLocaleDateString('en-GB')
+            };
+
+            state.scoresHistory.unshift(record);
+            localStorage.setItem('uasa_part6_scores_history', JSON.stringify(state.scoresHistory));
+
+            setElementText('resultGreeting', `Awesome job, ${record.name}! 🎉`);
+            setElementText('finalScoreDisplay', `${score} / 10`);
+            setElementText('wordCountResultBadge', `${words} words`);
+
+            submitToGoogleSheets(record);
+
+            document.getElementById('studioScreen')?.classList.add('hidden');
+            document.getElementById('resultsScreen')?.classList.remove('hidden');
+        }
+
+        function submitToGoogleSheets(record) {
+            const statusEl = document.getElementById('syncResultStatus');
+            if (!state.sheetUrl) {
+                if (statusEl) statusEl.innerHTML = `<i class="fa-solid fa-circle-info text-amber-300"></i> <span>Google Sheet URL not set by teacher yet.</span>`;
+                return;
+            }
+
+            if (statusEl) statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Syncing score to teacher cloud...</span>`;
+
+            fetch(state.sheetUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(record)
+            }).then(() => {
+                if (statusEl) statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-300"></i> <span>Score synced to Google Sheet!</span>`;
+            }).catch(() => {
+                if (statusEl) statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-300"></i> <span>Cloud sync offline (Saved locally).</span>`;
+            });
+        }
+
+        function triggerManualCloudSync() {
+            playSound('click');
+            if (state.scoresHistory.length > 0) {
+                submitToGoogleSheets(state.scoresHistory[0]);
+            } else {
+                showToast('No record to sync.', '⚠️');
+            }
+        }
+
+        function sendWhatsAppScore() {
+            playSound('click');
+            const topic = PART6_TOPICS[state.activeTopicIndex];
+            const record = state.scoresHistory[0] || {};
+            const draft = record.emailDraft || '';
+            const phone = state.teacherPhone ? state.teacherPhone.replace(/[^0-9]/g, '') : '';
+
+            const msg = `🌸 *UASA Part 6 Guided Writing Result* 🌸\n\n` +
+                `👤 *Pupil Name:* ${state.pupilName}\n` +
+                `🏫 *Class:* ${state.pupilClass}\n` +
+                `🎯 *Topic:* ${topic ? topic.title : ''} (${topic ? topic.level : ''})\n` +
+                `🏆 *Writing Score:* ${record.score || 10} / 10 (${record.wordCount || 0} words)\n\n` +
+                `📄 *Submitted Email Draft:*\n` +
+                `"${draft}"\n\n` +
+                `✨ *Submitted via UASA Part 6 Interactive Studio!*`;
+
+            const encoded = encodeURIComponent(msg);
+            const url = phone ? `https://api.whatsapp.com/send?phone=${phone}&text=${encoded}` : `https://api.whatsapp.com/send?text=${encoded}`;
+            window.open(url, '_blank');
+        }
+
+        function resetToStudio() {
+            playSound('click');
+            document.getElementById('resultsScreen')?.classList.add('hidden');
+            document.getElementById('studioScreen')?.classList.remove('hidden');
+        }
+
+        function openTeacherPinModal() {
+            playSound('click');
+            document.getElementById('pinInput').value = '';
+            document.getElementById('pinErrorMsg')?.classList.add('hidden');
+            document.getElementById('pinModal')?.classList.remove('hidden');
+        }
+
+        function closePinModal() {
+            playSound('click');
+            document.getElementById('pinModal')?.classList.add('hidden');
+        }
+
+        function verifyTeacherPin() {
+            const input = document.getElementById('pinInput');
+            const pin = input ? input.value.trim() : '';
+            if (pin === '1234') {
+                playSound('win');
+                closePinModal();
+                document.getElementById('welcomeScreen')?.classList.add('hidden');
+                document.getElementById('studioScreen')?.classList.add('hidden');
+                document.getElementById('resultsScreen')?.classList.add('hidden');
+                document.getElementById('teacherScreen')?.classList.remove('hidden');
+
+                const phoneIn = document.getElementById('teacherPhoneInput');
+                if (phoneIn && state.teacherPhone) phoneIn.value = state.teacherPhone;
+
+                const sheetIn = document.getElementById('teacherSheetUrlInput');
+                if (sheetIn && state.sheetUrl) sheetIn.value = state.sheetUrl;
+
+                renderTeacherTable();
+            } else {
+                playSound('click');
+                document.getElementById('pinErrorMsg')?.classList.remove('hidden');
+            }
+        }
+
+        function exitTeacherMode() {
+            playSound('click');
+            document.getElementById('teacherScreen')?.classList.add('hidden');
+            document.getElementById('welcomeScreen')?.classList.remove('hidden');
+        }
+
+        function saveTeacherPhone() {
+            playSound('click');
+            const input = document.getElementById('teacherPhoneInput');
+            const phone = input ? input.value.trim() : '';
+            state.teacherPhone = phone;
+            localStorage.setItem('uasa_part6_teacher_phone', phone);
+            showToast('Teacher WhatsApp phone saved!', '📱');
+        }
+
+        function saveTeacherSheetUrl() {
+            playSound('click');
+            const input = document.getElementById('teacherSheetUrlInput');
+            const url = input ? input.value.trim() : '';
+            state.sheetUrl = url;
+            localStorage.setItem('uasa_part6_sheet_url', url);
+            showToast('Google Sheet Web App URL saved!', '📊');
+        }
+
+        function syncLiveFromGoogleSheet() {
+            playSound('click');
+            if (!state.sheetUrl) {
+                showToast('Please save a valid Google Sheet Web App URL first!', '⚠️');
+                return;
+            }
+
+            const icon = document.getElementById('syncSpinIcon');
+            if (icon) icon.classList.add('fa-spin');
+
+            fetch(state.sheetUrl)
+                .then(res => res.json())
+                .then(resData => {
+                    if (icon) icon.classList.remove('fa-spin');
+                    if (resData.status === 'success' && Array.isArray(resData.data)) {
+                        state.scoresHistory = resData.data.map(item => ({
+                            id: item.Timestamp || Date.now().toString(),
+                            name: item.Name || 'Pupil',
+                            className: item.Class || '',
+                            avatar: item.Avatar || '🦊',
+                            topic: item.Topic || '',
+                            score: parseInt(item.Score || 0),
+                            maxScore: 10,
+                            wordCount: parseInt(item.WordCount || 0),
+                            emailDraft: item.EmailDraft || '',
+                            date: item.Timestamp ? new Date(item.Timestamp).toLocaleDateString('en-GB') : ''
+                        }));
+                        localStorage.setItem('uasa_part6_scores_history', JSON.stringify(state.scoresHistory));
+                        renderTeacherTable();
+                        showToast(`Fetched ${resData.data.length} records from Google Sheet!`, '☁️');
+                    } else {
+                        showToast('Error parsing data from Google Sheet.', '❌');
+                    }
+                })
+                .catch(() => {
+                    if (icon) icon.classList.remove('fa-spin');
+                    showToast('Failed to connect to Google Sheet. Check permissions.', '❌');
+                });
+        }
+
+        function renderTeacherTable() {
+            const tbody = document.getElementById('teacherTableBody');
+            const searchVal = (document.getElementById('teacherSearchInput')?.value || '').toLowerCase();
+            if (!tbody) return;
+
+            const filtered = state.scoresHistory.filter(r => 
+                (r.name || '').toLowerCase().includes(searchVal) || (r.className || '').toLowerCase().includes(searchVal) || (r.topic || '').toLowerCase().includes(searchVal)
+            );
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 font-bold text-xs">No pupil submission records found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(r => `
+                <tr class="hover:bg-slate-50/80 transition">
+                    <td class="p-3 font-bold text-slate-800 flex items-center gap-2">
+                        <span>${r.avatar || '🦊'}</span>
+                        <span>${r.name}</span>
+                    </td>
+                    <td class="p-3 text-slate-600 font-semibold text-xs">${r.className}</td>
+                    <td class="p-3 text-purple-700 font-bold text-xs">${r.topic}</td>
+                    <td class="p-3 text-center font-black text-purple-700">${r.score} / 10</td>
+                    <td class="p-3 text-center text-xs font-semibold text-slate-500">${r.wordCount} words</td>
+                    <td class="p-3 text-right text-xs text-slate-400 font-bold">${r.date}</td>
+                </tr>
+            `).join('');
+        }
+
+        function exportScoresCSV() {
+            playSound('click');
+            if (state.scoresHistory.length === 0) {
+                showToast('No scores to export.', '⚠️');
+                return;
+            }
+
+            let csv = 'Name,Class,Avatar,Topic,Score,MaxScore,WordCount,EmailDraft,Date\n';
+            state.scoresHistory.forEach(r => {
+                const cleanDraft = (r.emailDraft || '').replace(/"/g, '""').replace(/\n/g, ' ');
+                csv += `"${r.name}","${r.className}","${r.avatar}","${r.topic}",${r.score},10,${r.wordCount},"${cleanDraft}","${r.date}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `UASA_Part6_Scores_${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function promptClearScores() {
+            playSound('click');
+            if (confirm("Clear all local submission history on this browser?")) {
+                state.scoresHistory = [];
+                localStorage.removeItem('uasa_part6_scores_history');
+                renderTeacherTable();
+                showToast('Local scores history cleared.', '🗑️');
+            }
+        }
+
+        function openAppsScriptModal() {
+            playSound('click');
+            const modal = document.getElementById('scriptModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeAppsScriptModal() {
+            playSound('click');
+            const modal = document.getElementById('scriptModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function copyAppsScriptCode() {
+            playSound('click');
+            const codeEl = document.getElementById('scriptCodeSnippet');
+            if (!codeEl) return;
+            const code = codeEl.textContent;
+            const textarea = document.createElement('textarea');
+            textarea.value = code;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast('Apps Script snippet copied to clipboard!', '📋');
+        }
+    </script>
+</body>
+</html>
